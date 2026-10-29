@@ -1,0 +1,126 @@
+<!doctype html>
+<!--
+  QA report skeleton. Copy to docs/qa/<KEY>.html and replace the example blocks.
+  Write it in the report language (SKILL.md → Report language; English by
+  default, the examples below) and set <html lang> to match. Another language
+  takes its headings from reference/test-docs.md → Report language.
+  Screenshots stay files: reference them as shots/<KEY>/NN-what-it-shows.jpg and
+  publish with Artifact `files: {"shots/<KEY>/NN-….jpg": "docs/qa/shots/<KEY>/NN-….jpg", …}`
+  so the local file and the published page resolve the same relative paths.
+  Blocks, in this order: header + stats, walked path, charters, defects by
+  priority, laid out as SKILL.md → Phase 4 says (Highest and High as sections,
+  Medium as list items, Low and Lowest as table rows — every defect visible
+  with its id), rejected
+  leads by reason (four buckets; a lead that did not reproduce is an open
+  question), production risks (not verified), known — not filed, needs a
+  human, owners, checked and clean, open questions. Every value below is an example — replace
+  all of them.
+-->
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Saved items — QA</title>
+<style>
+:root{--bg:#faf8f5;--fg:#1a1a1a;--mut:#666;--line:#e3ded6;--card:#fff;--ok:#1a7f4b;--hi:#b3261e;--wr:#8a6100}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#16141a;--fg:#ece8e3;--mut:#9a938c;--line:#2e2a33;--card:#1e1b23;--ok:#4cc38a;--hi:#ff6b5e;--wr:#e0b341}}
+:root[data-theme=dark]{--bg:#16141a;--fg:#ece8e3;--mut:#9a938c;--line:#2e2a33;--card:#1e1b23;--ok:#4cc38a;--hi:#ff6b5e;--wr:#e0b341}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:30px;line-height:1.25;margin:0 0 6px}
+h2{font-size:21px;margin:48px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+h3{font-size:17px;margin:0 0 10px} h4{font-size:15px;margin:0 0 8px}
+.sub{color:var(--mut);margin:0 0 28px;font-size:14px}
+a{color:inherit}
+code{background:color-mix(in srgb,var(--fg) 8%,transparent);padding:1px 5px;border-radius:4px;font-size:.87em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;vertical-align:middle;margin-left:6px}
+.tag.ok{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.tag.bad{background:color-mix(in srgb,var(--hi) 18%,transparent);color:var(--hi)}
+.tag.warn{background:color-mix(in srgb,var(--wr) 20%,transparent);color:var(--wr)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin:16px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 17px}
+.stat b{display:block;font-size:25px;line-height:1.15}
+.stat span{color:var(--mut);font-size:13px}
+.no{color:var(--hi)} .yes{color:var(--ok)}
+.step{display:grid;grid-template-columns:260px 1fr;gap:26px;align-items:start;padding:22px 0;border-top:1px solid var(--line)}
+.step figure,.shots figure{margin:0}
+.step img,.shots img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+figcaption{color:var(--mut);font-size:13px;line-height:1.35;margin-top:6px}
+.shots{display:grid;gap:12px;margin-top:10px;grid-template-columns:repeat(2,minmax(0,220px))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+.card p{margin:8px 0;color:var(--mut)}
+ul{margin:0;padding-left:20px} li{margin:7px 0}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mut);font-weight:650;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--mut);font-size:13px}
+@media(max-width:720px){.step{grid-template-columns:1fr}.step figure{max-width:340px;margin:0 auto}.shots{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style></head><body><div class="wrap">
+
+<h1>APP-325 — run report</h1>
+<p class="sub"><code>main</code> @ <code>94db324</code> · stage, web · account with library access · 2026-09-23</p>
+
+<div class="grid">
+  <div class="stat"><b class="yes">788</b><span>unit and widget tests green, <code>dart analyze</code> clean</span></div>
+  <div class="stat"><b class="yes">33 / 33</b><span>e2e regression on stage, 14 min</span></div>
+  <div class="stat"><b class="no">5</b><span>bugs filed: <a href="https://&lt;jira&gt;/browse/APP-413">APP-413</a>, …</span></div>
+  <div class="stat"><b>3</b><span>checks wait for a human — device only</span></div>
+</div>
+
+<h2>Path I walked</h2>
+<section class="step">
+  <figure><img src="shots/APP-325/01-home.jpg" alt="Library home"><figcaption>Library home</figcaption></figure>
+  <div><h3>Library home <span class="tag ok">passed</span></h3>
+    <ul><li>What was checked and what I saw — one line per observation.</li></ul></div>
+</section>
+
+<h2>Charters</h2>
+<table><tr><th>Charter</th><th>Setting</th><th>Outcome</th><th>Findings</th><th>Not reached</th></tr>
+<tr><td><code>saved-skeptic</code> — Saved: save and unsave three items, check the counts</td><td>numbers and copy</td><td>budget</td><td>3: 1 → D-04, 2 rejected</td><td>the Share sheet</td></tr></table>
+
+<h2>Defects — Highest and High</h2>
+<section>
+  <h3>Five minutes offline — <a href="https://&lt;jira&gt;/browse/APP-413">APP-413</a> <span class="tag bad">high</span></h3>
+  <div class="shots">
+    <figure><img src="shots/APP-325/91-offline-fresh.jpg" alt=""><figcaption>before: version fresh, served from cache</figcaption></figure>
+    <figure><img src="shots/APP-325/92-offline-expired.jpg" alt=""><figcaption>after: version expired, error</figcaption></figure>
+  </div>
+  <p>What the user sees, why (the file), how to reproduce — 2–3 sentences. Reproduced: web · mobile @ <code>94db324</code>, not in the desktop view.</p>
+</section>
+
+<h2>Defects — Medium</h2>
+<ul><li><a href="https://&lt;jira&gt;/browse/APP-414">APP-414</a> — a saved item shows up in the list only after a page reload (<a href="shots/APP-325/40-saved-missing.jpg">40</a>).</li></ul>
+
+<h2>Defects — Low and Lowest</h2>
+<table><tr><th>ID</th><th>Priority</th><th>What is visible</th><th>How reproduced</th><th>Shot</th></tr>
+<tr><td><a href="https://&lt;jira&gt;/browse/APP-415">APP-415</a></td><td>Low</td><td><code>save_item</code> kept its name but lost four properties — visible in analytics only</td><td>web · desktop @ <code>94db324</code>, save an item</td><td>payload in the ticket</td></tr>
+<tr><td><a href="https://&lt;jira&gt;/browse/APP-416">APP-416</a></td><td>Low</td><td>A load error shows "0 items" above the error text</td><td>web · both views @ <code>94db324</code>, network cut with <code>net.js</code></td><td><a href="shots/APP-325/41-zero-items.jpg">41</a></td></tr>
+<tr><td>D-07</td><td>Lowest</td><td>The "Save" button is clipped at 320 px</td><td>web · mobile @ <code>94db324</code>, <code>emulate 320x640x2,mobile,touch</code></td><td><a href="shots/APP-325/42-narrow.jpg">42</a></td></tr></table>
+
+<h2>Rejected, with the reason</h2>
+<table><tr><th>Reason</th><th>Lead</th><th>What settled it</th></tr>
+<tr><td>tool artefact</td><td>R-03: "the button does not respond"</td><td>a control click on the next button did not arrive either — a synthetic event</td></tr>
+<tr><td>by design</td><td><code>saved-skeptic</code> F-02: the count leaves out the archive</td><td>AC-325.4</td></tr>
+<tr><td>stand data</td><td><code>saved-state</code> F-01: a course has no cover</td><td>the stage catalogue has an empty cover field for it</td></tr></table>
+
+<h2>Production risks (not checked)</h2>
+<ul><li>A Google Play Billing failure on renewal cannot be reproduced on web — there is no native payment there; by the code the subscription screen shows no error, so an Android user in production would see the old status.</li></ul>
+
+<h2>Known — do not file</h2>
+<ul><li>A team decision or "by design" — one line, who decided.</li></ul>
+
+<h2>Needs a human</h2>
+<table><tr><th>Check</th><th>Why not on web</th><th>Device, setting, build</th><th>Steps (≤ 3)</th><th>Where to look</th></tr>
+<tr><td>Sheet safe area with large text</td><td>Web has no system insets</td><td>iPhone with Dynamic Island, Larger Text max, stage ≥ &lt;build&gt;</td><td>Library → a list → an item</td><td>Top of the sheet: handle and close button below the clock</td></tr></table>
+
+<h2>Decisions and access</h2>
+<table><tr><th>What</th><th>Who</th></tr>
+<tr><td>Rewrite the ACs in APP-325 to match what shipped</td><td>PO</td></tr></table>
+
+<h2>Checked and clean</h2>
+<ul><li>One line per confirmed property.</li></ul>
+
+<h2>Open questions</h2>
+<ol><li>The question — to whom.</li></ol>
+
+<footer>Checklist and impact — <code>docs/qa/APP-325.md</code>; cases — <code>docs/qa/APP-325-test-cases.md</code>; tests audit — <code>docs/qa/APP-325-tests.md</code>.</footer>
+</div></body></html>

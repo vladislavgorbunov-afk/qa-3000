@@ -1,0 +1,10 @@
+{
+  "name": "qa-3000",
+  "description": "One QA cycle for a feature or a bug fix: impact, checklist and atomic cases, a live run on the web stand in desktop and mobile views, exploratory charters, reproduced Jira bugs with screenshots, TestRail smoke, a tests audit and e2e gaps. App facts live in a per-repo profile.",
+  "author": {
+    "name": "Vladislav Gorbunov"
+  },
+  "repository": "https://github.com/vladislavgorbunov-afk/qa-3000",
+  "license": "MIT",
+  "keywords": ["qa", "testing", "flutter", "jira", "testrail", "e2e"]
+}

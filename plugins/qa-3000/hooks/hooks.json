@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__Claude_Browser__.*|mcp__claude-in-chrome__.*|mcp__Claude_Code_iOS_Simulator__control|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/skills/qa-3000/scripts/nav_map_hook.sh 2>/dev/null || true",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

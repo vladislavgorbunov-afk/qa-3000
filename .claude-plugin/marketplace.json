@@ -1,0 +1,15 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "qa-3000",
+  "description": "End-to-end QA cycle skill for Claude Code",
+  "owner": {
+    "name": "Vladislav Gorbunov"
+  },
+  "plugins": [
+    {
+      "name": "qa-3000",
+      "source": "./plugins/qa-3000",
+      "description": "One QA cycle for a feature or a bug fix: impact, checklist and atomic cases, a live run on the web stand in desktop and mobile views, exploratory charters, reproduced Jira bugs with screenshots, TestRail smoke, a tests audit and e2e gaps. App facts live in a per-repo profile."
+    }
+  ]
+}

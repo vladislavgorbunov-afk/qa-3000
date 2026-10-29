@@ -34,18 +34,26 @@ to drive and observe a Flutter web app, whichever one it is.
 Every feature is checked in both — never one of them (`SKILL.md` → Phase 2,
 Both views). Set the view with one chrome-devtools `emulate` call (each call
 replaces the previous emulation, so pass everything at once), then reload the
-page: Flutter reads the platform and the size at start-up.
+page with `navigate_page` `type: "reload"`: Flutter reads the platform and the
+size at start-up.
 
-| View | `emulate` |
-|---|---|
-| Desktop | `viewport: "1440x900x1"`, `userAgent: ""` (the browser's own) |
-| Mobile | `viewport: "390x844x3,mobile,touch"`, `userAgent:` an iPhone Safari string (`Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1`) |
+| View | `emulate` | The reload |
+|---|---|---|
+| Desktop | `viewport: "1440x900x1"`, `userAgent: ""` (the browser's own) | no `initScript` |
+| Mobile | `viewport: "390x844x3,mobile,touch"`, `userAgent:` an iPhone Safari string (`Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1`) | `initScript: "Object.defineProperty(Navigator.prototype, 'platform', { get: () => 'iPhone' });"` |
 
-- **Width alone is not the mobile view.** An app can branch on
-  `defaultTargetPlatform`, which Flutter web takes from the user agent, not
-  from the width — `resize_page` to 390 px keeps such an app on its desktop
-  branch. Check the view took: `evaluate_script`
-  `() => [innerWidth, navigator.userAgent, matchMedia('(pointer: coarse)').matches]`.
+- **Width alone is not the mobile view, and neither is the user agent.** An
+  app can branch on `defaultTargetPlatform`, which Flutter web takes from
+  `navigator.platform` first: on a Mac host that is `MacIntel`, and with at
+  most two touch points (emulated touch gives one) Flutter stays on macOS
+  whatever the user agent and the width say. The `initScript` makes it
+  `iPhone`. It covers one navigation only — pass it again with every reload
+  or `navigate_page` in the mobile view. An Android view: `'Linux armv8l'`
+  and an Android Chrome user agent. Check the view took, before switching
+  semantics on: `evaluate_script`
+  `() => [innerWidth, navigator.platform, document.querySelector('flt-semantics-placeholder')?.getBoundingClientRect().width]`
+  — Flutter's placeholder spans the whole width when it took a mobile
+  platform, and is 1 px wide on desktop.
 - Profile → Stand may name the app's own breakpoints or views; then check at
   each of them, still at least one desktop and one mobile.
 - The reload drops `scripts/net.js` — install it again after every switch,
@@ -63,8 +71,12 @@ page: Flutter reads the platform and the size at start-up.
   the VM service; `texts` lists every string on screen. Prefer `ByType` with the
   widget class name — `ByText` often matches a title and a button at once.
 - **Real browser clicks** (any build): `evaluate_script`
-  `() => { document.querySelector('flt-semantics-placeholder').click(); return true; }`
+  `() => { const p = document.querySelector('flt-semantics-placeholder'); if (!p) return 'already on'; const r = p.getBoundingClientRect(); p.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 })); return true; }`
   switches on Flutter's semantics tree; then `take_snapshot` and `click <uid>`.
+  The click must land on the placeholder's centre: on a mobile platform
+  Flutter takes only a click within 1 px of it (the way a screen reader taps)
+  and switches on ~0.3 s later; a plain `.click()` lands at 0,0 and is
+  ignored there. Desktop takes any click on the placeholder.
   These are trusted CDP clicks delivered as `SemanticsAction.tap` — they skip
   hit-testing, so they cannot prove a tap *dead zone* either way.
 - **Typing**: `click` the field, then `type_text`. `fill` does not reach
@@ -91,8 +103,9 @@ page: Flutter reads the platform and the size at start-up.
   background task (the Bash tool's background run), not `nohup … &` — that one
   dies with the shell that started it; and check the port first, another
   session's driver may hold it. The same semantics clicks apply:
-  click `flt-semantics-placeholder`, then a real `page.mouse.click` at the
-  centre of the labelled node.
+  click the centre of `flt-semantics-placeholder`, then a real
+  `page.mouse.click` at the centre of the labelled node. The mobile view
+  takes the same `navigator.platform` override, through `page.addInitScript`.
 - **Merged labels**: a parent semantics node carries all its children's text
   (`Topic\nHistory\nChange`, a whole list in one row). Match the exact label
   (`^Change$`), never a substring, or the click lands in the parent's centre —

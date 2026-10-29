@@ -46,8 +46,8 @@ team shares it:
 - `.claude/qa-3000/nav.md` — the navigation map: how to reach each screen by
   visible labels, and the dead ends. Start from
   [`templates/nav.md`](plugins/qa-3000/skills/qa-3000/templates/nav.md).
-  The plugin's hook puts it into Claude's context before the first navigation
-  action of a session.
+  The plugin's hook puts it into each agent's context before its first
+  navigation action, and again after a compaction.
 
 No profile yet? The first cycle drafts one into `docs/qa/profile.md` from what
 the repo and the APIs show, asks only for what is missing, and offers it as a

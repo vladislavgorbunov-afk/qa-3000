@@ -1,15 +1,30 @@
 #!/usr/bin/env python3
-"""Per-target navigation metrics from nav-log.jsonl: actions, seconds, dead ends, human asks, map hit."""
+"""Per-target navigation metrics from nav-log.jsonl: actions, seconds, dead ends, human asks, map hit.
+
+Usage: nav_report.py [--session <id> | --all] [log]
+Default: this Claude session only (CLAUDE_CODE_SESSION_ID), so earlier cycles stay out. Actions a
+subagent took (charters in their own pages) carry its agent id and are never counted.
+"""
 import json, sys, os
 from datetime import datetime
-log = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.environ.get("CLAUDE_PROJECT_DIR", os.getcwd()), "docs/qa/nav/nav-log.jsonl")
+import navlog
+
+args = sys.argv[1:]
+session = os.environ.get("CLAUDE_CODE_SESSION_ID")
+if "--all" in args:
+    args.remove("--all"); session = None
+if "--session" in args:
+    i = args.index("--session"); session = args[i + 1]; del args[i:i + 2]
+log = args[0] if args else navlog.log_path()
 rows = [json.loads(l) for l in open(log) if l.strip()]
+rows = [r for r in rows if not r.get("agent") and (session is None or r.get("session") == session)]
 ts = lambda r: datetime.fromisoformat(r["t"])
-out, cur = [], None
+out, open_by_session = [], {}
 for r in rows:
-    m = r.get("mark")
+    m, s = r.get("mark"), r.get("session", "")
+    cur = open_by_session.get(s)
     if m == "start":
-        cur = {"target": r["arg"], "route": r["arg2"] or "search", "t0": ts(r), "actions": 0, "deadends": 0, "human": 0}
+        open_by_session[s] = {"target": r["arg"], "route": r["arg2"] or "search", "t0": ts(r), "actions": 0, "deadends": 0, "human": 0}
     elif cur is None:
         continue
     elif m is None:
@@ -20,7 +35,9 @@ for r in rows:
         cur["human"] += 1
     elif m == "done":
         cur["sec"] = int((ts(r) - cur["t0"]).total_seconds()); cur["result"] = r["arg2"] or "ok"
-        out.append(cur); cur = None
+        out.append(cur); open_by_session[s] = None
+if session:
+    print(f"session {session}")
 print(f"{'target':28} {'route':24} {'act':>4} {'sec':>5} {'dead':>4} {'ask':>3} result")
 for o in out:
     print(f"{o['target'][:28]:28} {o['route'][:24]:24} {o['actions']:>4} {o['sec']:>5} {o['deadends']:>4} {o['human']:>3} {o['result']}")

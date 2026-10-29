@@ -2,7 +2,19 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "mcp__Claude_Browser__.*|mcp__claude-in-chrome__.*|mcp__Claude_Code_iOS_Simulator__control|Bash",
+        "matcher": "mcp__Claude_Browser__.*|mcp__claude-in-chrome__.*|mcp__Claude_Code_iOS_Simulator__control|chrome-devtools__(click|drag|fill|fill_form|hover|press_key|type_text|navigate_page|new_page|handle_dialog|upload_file)$|playwright__browser_(click|drag|drop|hover|press_key|type|fill_form|select_option|navigate|navigate_back|file_upload|handle_dialog)$|^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/skills/qa-3000/scripts/nav_map_hook.sh 2>/dev/null || true",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
         "hooks": [
           {
             "type": "command",

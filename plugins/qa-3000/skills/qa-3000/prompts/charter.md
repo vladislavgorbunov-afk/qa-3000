@@ -23,7 +23,10 @@ reference/charters.md, verbatim>`
   (`<where the password login is>`). This account is yours alone.
 - View: `<desktop | mobile>` — set it right after `new_page` with one
   `emulate` call and a reload, exactly as `reference/live-web.md` → Desktop
-  and mobile view gives it: `<the emulate arguments>`. Stay in it.
+  and mobile view gives it: `<the emulate arguments>`, then `navigate_page`
+  `type: "reload"` with `<the reload's initScript, or none for desktop>`.
+  Stay in it: in the mobile view pass that `initScript` with every reload or
+  navigation, or the app falls back to its desktop platform.
 - Start screen: `<screen>`, reached by `<route from the navigation map, by
   visible label>`.
 - Stay inside: `<the area's boundary — the screens this charter covers>`.
@@ -55,8 +58,9 @@ back in every new isolated context and covers the bottom of the screen.
 
 Flutter web draws on a canvas. Before the first snapshot, switch its
 semantics tree on: `evaluate_script` with
-`() => { document.querySelector('flt-semantics-placeholder').click(); return true; }`,
-then `take_snapshot`. Only if the snapshot still shows nothing but an
+`() => { const p = document.querySelector('flt-semantics-placeholder'); if (!p) return 'already on'; const r = p.getBoundingClientRect(); p.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 })); return true; }`
+(the click must land on the placeholder's centre — the mobile view ignores
+any other), then `take_snapshot`. Only if the snapshot still shows nothing but an
 `Enable accessibility` button, `click` that button's uid. From then on,
 `take_snapshot` → `click <uid>`. **After every reload or navigation** switch
 it on again the same way — and run `net.js` again if you use it: a page load

@@ -113,7 +113,8 @@ cases.
    open PR — not the base branch's tip, which has moved on). The audit and
    phase 3d prove the regression test against both. **Rolling the fix back**
    means, in a worktree at the fix ref with nothing uncommitted: for each
-   non-test path in `git diff --name-status <pre-fix> <fix>`, `M` or `D` →
+   non-test path in `git diff --name-status --no-renames <pre-fix> <fix>`
+   (a move then shows as `D` + `A`, not `R`), `M`, `T` or `D` →
    `git checkout <pre-fix> -- <path>`, `A` → `git rm -q <path>`; codegen again
    if those paths feed it. `git reset --hard HEAD` brings the fix back.
    `gh` not logged in but git can push over HTTPS: prefix calls with
@@ -515,7 +516,7 @@ drafts, and name what stays up for the main session.
 | Guessing a Jira field, a TestRail project or a stand | Take it from the profile; no profile → the template, and ask at Stop 1 |
 | Auditing the tests inline and burying the result in the report | Background subagent, its own file `<KEY>-tests.md` |
 | Checking a feature in one view only (desktop, or only the mobile width) | Every on-screen item in both views, a status and a screenshot per view (`reference/live-web.md` → Desktop and mobile view) |
-| "Mobile view" by `resize_page` alone | Width, touch and a mobile user agent together, then reload — the app may branch on the platform, not on the width |
+| "Mobile view" by `resize_page` or a user agent alone | Width, touch, a mobile user agent and the `navigator.platform` override together, then reload — Flutter takes the platform from `navigator.platform`, not from the width or the user agent |
 | Planning simulators and emulators by default | The web stand; device-only checks go to the Needs a human table unless the user asked for native or the profile's **Overrides:** line, named at Stop 1, says otherwise |
 | Pushing every case to TestRail, or asking where they go | The md keeps the full set; the ★ cases go to the rule's subsection, confirmed at Stop 2 |
 | Running the e2e suite inside the tests audit, or in the worktree a local app runs from | The audit reads the scenarios; the regression is its own background run in its own worktree |
@@ -540,7 +541,7 @@ drafts, and name what stays up for the main session.
 | Screenshots on an analytics or payload bug | The payload goes into Steps verbatim; a picture adds nothing |
 | Analytics checked in one vendor, or by the request alone | Every vendor the profile names, and each one's response — a 400 means the event never lands |
 | "Works on screen" taken as clean while the console or Sentry logs an error on open | Read both on every new screen; an unhandled error is a defect even when the user sees nothing — and an e2e scenario that catches it to stay green is a finding, not a fix |
-| Searching a screen by screenshots and coordinates | The navigation map first, then tap by label (`tap_text_android.sh`, `tap_text_ios.sh`, web semantics `find`) |
+| Searching a screen by screenshots and coordinates | The navigation map first, then tap by label (`tap_text_android.sh`, `tap_text_ios.sh`, web `take_snapshot` → `click <uid>`) |
 | Finishing a cycle with what you learned about navigation only in your head | Phase 6: new routes, dead ends and broken routes into `docs/qa/nav/pending.md` |
 | Testing only the checklist | Three to five charters explore beside the live run (`reference/charters.md`) |
 | Charters sharing a page, a cookie jar or an account | Each in its own isolated context (`new_page isolatedContext`), its `pageId` on every call, its own account |

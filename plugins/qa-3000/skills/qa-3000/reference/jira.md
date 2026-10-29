@@ -142,28 +142,36 @@ async () => {
   const H = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-Atlassian-Token': 'no-check' };
   const out = [];
   for (const b of window.__bugs) {
-    if (b.key) { out.push({ key: b.key, skipped: true }); continue; }
-    const create = { fields: { project: { key: J.project }, issuetype: { name: J.type }, summary: b.summary,
-      priority: { name: b.priority }, components: b.components.map(n => ({ name: n })) } };
-    const r1 = await fetch('/rest/api/3/issue', { method: 'POST', headers: H, body: JSON.stringify(create) });
-    const j1 = await r1.json();
-    if (!j1.key) { out.push({ error: r1.status, body: j1 }); return out; }
-    b.key = j1.key;
-    const edit = { fields: { [J.what]: b.w, [J.how]: b.h, [J.steps]: b.s } };
-    if (J.more) edit.fields[J.more] = b.d;
-    const r2 = await fetch('/rest/api/3/issue/' + b.key, { method: 'PUT', headers: H, body: JSON.stringify(edit) });
-    const link = { type: { name: 'Relates' }, inwardIssue: { key: b.key }, outwardIssue: { key: b.link } };
-    const r3 = await fetch('/rest/api/3/issueLink', { method: 'POST', headers: H, body: JSON.stringify(link) });
-    out.push({ key: b.key, edit: r2.status, link: r3.status });
+    if (!b.key) {
+      const create = { fields: { project: { key: J.project }, issuetype: { name: J.type }, summary: b.summary,
+        priority: { name: b.priority }, components: b.components.map(n => ({ name: n })) } };
+      const r1 = await fetch('/rest/api/3/issue', { method: 'POST', headers: H, body: JSON.stringify(create) });
+      const j1 = await r1.json();
+      if (!j1.key) { out.push({ error: r1.status, body: j1 }); return out; }
+      b.key = j1.key;
+    }
+    if (b.editStatus !== 204) {
+      const edit = { fields: { [J.what]: b.w, [J.how]: b.h, [J.steps]: b.s } };
+      if (J.more) edit.fields[J.more] = b.d;
+      const r2 = await fetch('/rest/api/3/issue/' + b.key, { method: 'PUT', headers: H, body: JSON.stringify(edit) });
+      b.editStatus = r2.status; b.editBody = r2.status === 204 ? null : await r2.text();
+    }
+    if (b.linkStatus !== 201) {
+      const link = { type: { name: 'Relates' }, inwardIssue: { key: b.key }, outwardIssue: { key: b.link } };
+      const r3 = await fetch('/rest/api/3/issueLink', { method: 'POST', headers: H, body: JSON.stringify(link) });
+      b.linkStatus = r3.status; b.linkBody = r3.status === 201 ? null : await r3.text();
+    }
+    out.push({ key: b.key, edit: b.editStatus, link: b.linkStatus, editBody: b.editBody, linkBody: b.linkBody });
   }
   return out;
 }
 ```
 
-`edit` must be `204` and `link` `201`; anything else — read the body before
-retrying, the issue already exists (the `b.key` guard stops a duplicate). When
-the profile puts the roles into the Description instead, send one
-`description` doc in `edit`.
+`edit` must be `204` and `link` `201`; anything else — read its body, fix the
+cause, run call 2 again: each bug remembers its key and the steps that
+succeeded, so a rerun creates nothing twice and repeats only the step that
+failed. When the profile puts the roles into the Description instead, send
+one `description` doc in `edit`.
 
 ## Attachments without base64
 

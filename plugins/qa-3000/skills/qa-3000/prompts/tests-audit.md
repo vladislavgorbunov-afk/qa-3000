@@ -88,7 +88,8 @@ its path and the numbers from its header.
    is in the backend's repository). Prove each test in a worktree
    detached at the fix ref itself (not a later commit): run it — it must pass;
    roll the fix back — for each non-test path in
-   `git diff --name-status <pre-fix> <fix>`, `M` or `D` →
+   `git diff --name-status --no-renames <pre-fix> <fix>` (a move then shows
+   as `D` + `A`), `M`, `T` or `D` →
    `git checkout <pre-fix> -- <path>`, `A` → `git rm -q <path>`, codegen again
    if those paths feed it — and run it again: it must fail, the way its bug case
    describes; `git reset --hard HEAD` restores the fix.

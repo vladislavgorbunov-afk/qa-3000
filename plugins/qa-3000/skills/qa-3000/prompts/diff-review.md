@@ -8,7 +8,9 @@ tests audit — it runs while you test the app live. Its candidates feed phase
 ---
 
 You review one change in `<app>` for defects a user or the business would notice.
-Read-only, in `<repo path>` without a worktree: `git diff <base>..<head>`,
+Read-only, in `<repo path>` without a worktree: `git diff <base>...<head>`
+(three dots — what the change did since it left `<base>`, not what `<base>`
+gained since),
 and every file it touches in full **at `<head>`** — `git show <head>:<path>`,
 not the working tree, which may be on another branch. Stories: `<KEY…>`; acceptance criteria:
 `<file or pasted list>`. Do not change anything, do not run the app or tests,

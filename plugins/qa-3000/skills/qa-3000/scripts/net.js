@@ -21,6 +21,9 @@
 //                                      hold matching XHRs before sending them —
 //                                      a slow network for one endpoint, enough
 //                                      to tap Back mid-load. null turns it off.
+//                                      An abort while held cancels the send —
+//                                      the request never leaves, and the log
+//                                      gets {aborted: true}.
 //
 // Keep this file free of backticks and of await inside expressions:
 // evaluate_script rejects both with "missing ) after argument list".
@@ -47,6 +50,7 @@
 
   const origOpen = XMLHttpRequest.prototype.open;
   const origSend = XMLHttpRequest.prototype.send;
+  const origAbort = XMLHttpRequest.prototype.abort;
   XMLHttpRequest.prototype.open = function (method, url, ...rest) {
     const u = String(url);
     this.__qaUrl = u;
@@ -60,10 +64,21 @@
     const u = this.__qaUrl || '';
     recordAmplitude(u, body);
     if (qa.delay && u.indexOf(qa.delay.match) >= 0) {
-      setTimeout(() => origSend.call(this, body), qa.delay.ms);
+      this.__qaHeld = setTimeout(() => {
+        this.__qaHeld = null;
+        origSend.call(this, body);
+      }, qa.delay.ms);
       return undefined;
     }
     return origSend.call(this, body);
+  };
+  XMLHttpRequest.prototype.abort = function () {
+    if (this.__qaHeld) {
+      clearTimeout(this.__qaHeld);
+      this.__qaHeld = null;
+      qa.log.push({ t: now(), via: 'xhr', aborted: true, u: (this.__qaUrl || '').split('?')[0] });
+    }
+    return origAbort.call(this);
   };
 
   const origFetch = window.fetch;

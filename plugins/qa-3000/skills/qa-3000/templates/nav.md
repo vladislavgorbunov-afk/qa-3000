@@ -11,9 +11,10 @@ end, a route that broke).
 
 Steps are **visible labels** (Flutter semantics), so one route works on every
 platform:
-- web — enable semantics first (trusted click on `flt-semantics-placeholder`),
-  then `take_snapshot` → `click <uid>`; sheets and dialogs may be missing from
-  the plain snapshot — take a `verbose` one;
+- web — switch semantics on first (a click at the centre of
+  `flt-semantics-placeholder`, `reference/live-web.md` → Driving), then
+  `take_snapshot` → `click <uid>`; sheets and dialogs may be missing from the
+  plain snapshot — take a `verbose` one;
 - Android — `<skill>/scripts/tap_text_android.sh "<label>" [serial]`
   (uiautomator; `--list` prints labels and their centres);
 - iOS simulator — `<skill>/scripts/tap_text_ios.sh "<label>" [udid]` (AXe).
